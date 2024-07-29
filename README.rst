@@ -1,5 +1,6 @@
 envparse2
-========
+=========
+
 ``envparse2`` is a simple utility to parse environment variables.
 
 NOTE: `envparse2` is a fork of `envparse` which is no longer maintained, to check
