@@ -40,11 +40,3 @@ jobs:
       - name: Tests
         run: |
           pytest
-
-  success:
-    needs: test
-    runs-on: ubuntu-latest
-    name: test successful
-    steps:
-      - name: Success
-        run: echo Test successful
