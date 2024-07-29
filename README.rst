@@ -1,6 +1,9 @@
-envparse
+envparse2
 ========
-``envparse`` is a simple utility to parse environment variables.
+``envparse2`` is a simple utility to parse environment variables.
+
+NOTE: `envparse2` is a fork of `envparse` which is no longer maintained, to check
+original author and code visit <https://github.com/rconradharris/envparse.git>
 
 If you use Heroku and/or subscribe to the tenets of the
 `12 Factor App <http://www.12factor.net/>`_
@@ -9,7 +12,7 @@ you'll be using a lot of environment variable-based configuration in your app.
 yourself duplicating quite a bit of code around handling raw environment
 variables.
 
-``envparse`` aims to eliminate this duplicated, often inconsistent parsing
+``envparse2`` aims to eliminate this duplicated, often inconsistent parsing
 code and instead provide a single, easy-to-use wrapper.
 
 Ideas, and code portions, have been taken from `django-environ
@@ -21,15 +24,7 @@ Installing
 ----------
 Through PyPI::
 
-    $ pip install envparse
-
-Manually::
-
-    $ pip install git+https://github.com/rconradharris/envparse.git
-    OR
-    $ git clone https://github.com/rconradharris/envparse && cd envparse
-    $ python setup.py install
-
+    $ pip install envparse2
 
 Usage
 -----
@@ -39,10 +34,10 @@ parser or one with a schema:
 .. code-block:: python
 
     # Standard
-    from envparse import env
+    from envparse2 import env
 
     # Schema
-    from envparse import Env
+    from envparse2 import Env
     env = Env(BOOLEAN_VAR=bool, LIST_VAR=dict(cast=list, subcast=int))
 
 
@@ -181,16 +176,3 @@ Read from a .env file (line delimited KEY=VALUE):
 
     # Values can be read as normal
     env.int('FOO')
-
-
-Tests
------
-.. image:: https://secure.travis-ci.org/rconradharris/envparse.png?branch=master
-
-To run the tests install tox::
-
-    pip install tox
-
-Then run them with::
-
-    make test

@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 import pytest
 
-from envparse import Env, env, ConfigurationError, urlparse
+from envparse2 import Env, env, ConfigurationError, urlparse
 
 
 env_vars = dict(

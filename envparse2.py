@@ -9,11 +9,7 @@ import os
 import re
 import shlex
 import warnings
-try:
-    import urllib.parse as urlparse
-except ImportError:
-    # Python 2
-    import urlparse
+import urllib.parse as urlparse
 
 
 __version__ = '0.2.0'
