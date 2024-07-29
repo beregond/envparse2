@@ -1,8 +1,7 @@
 from __future__ import print_function
-from setuptools import setup, find_packages
+from setuptools import setup
 import codecs
 import os
-import sys
 import re
 
 
@@ -23,7 +22,7 @@ def find_version(*file_paths):
 setup(
     name="envparse2",
     version=find_version(".", "envparse2.py"),
-    url="https://github.com/rconradharris/envparse",
+    url="https://github.com/beregond/envparse2",
     license="MIT",
     author="Rick Harris",
     author_email="rconradharris@gmail.com",

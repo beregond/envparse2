@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.3.0
+-----
+
+ - Repackaged as `envparse2` to be able to install on newer versions of Python.
+
+
 v0.2.0
 ------
 

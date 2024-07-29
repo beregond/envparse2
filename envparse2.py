@@ -12,7 +12,7 @@ import warnings
 import urllib.parse as urlparse
 
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 
 logger = logging.getLogger(__file__)
