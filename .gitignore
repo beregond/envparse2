@@ -9,6 +9,8 @@ dist
 .eggs
 *.whl
 
+src/envparse2/_version.py
+
 # coverage
 .coverage
 htmlcov
