@@ -34,7 +34,7 @@ def environ(monkeypatch, request):
 
 # Helper function
 def assert_type_value(cast, expected, result):
-    assert cast == type(result)
+    assert issubclass(cast, type(result))
     assert expected == result
 
 

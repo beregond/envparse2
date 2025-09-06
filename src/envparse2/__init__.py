@@ -1,6 +1,7 @@
 """
 envparse is a simple utility to parse environment variables.
 """
+
 from __future__ import unicode_literals
 import inspect
 import json as pyjson
@@ -12,9 +13,6 @@ import warnings
 import urllib.parse as urlparse
 
 
-__version__ = '0.3.0'
-
-
 logger = logging.getLogger(__file__)
 
 
@@ -23,12 +21,13 @@ class ConfigurationError(Exception):
 
 
 # Cannot rely on None since it may be desired as a return value.
-NOTSET = type(str('NoValue'), (object,), {})
+NOTSET = object()
 
 
 def shortcut(cast):
     def method(self, var, **kwargs):
         return self.__call__(var, cast=cast, **kwargs)
+
     return method
 
 
@@ -47,13 +46,22 @@ class Env(object):
         if env('MAIL_ENABLED'):
             ...
     """
-    BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
+
+    BOOLEAN_TRUE_STRINGS = ("true", "on", "ok", "y", "yes", "1")
 
     def __init__(self, **schema):
         self.schema = schema
 
-    def __call__(self, var, default=NOTSET, cast=None, subcast=None,
-                 force=False, preprocessor=None, postprocessor=None):
+    def __call__(
+        self,
+        var,
+        default=NOTSET,
+        cast=None,
+        subcast=None,
+        force=False,
+        preprocessor=None,
+        postprocessor=None,
+    ):
         """
         Return value for given environment variable.
 
@@ -68,18 +76,23 @@ class Env(object):
 
         :returns: Value from environment or default (if set).
         """
-        logger.debug("Get '%s' casted as '%s'/'%s' with default '%s'", var,
-                     cast, subcast, default)
+        logger.debug(
+            "Get '%s' casted as '%s'/'%s' with default '%s'",
+            var,
+            cast,
+            subcast,
+            default,
+        )
 
         if var in self.schema:
             params = self.schema[var]
             if isinstance(params, dict):
                 if cast is None:
-                    cast = params.get('cast', cast)
+                    cast = params.get("cast", cast)
                 if subcast is None:
-                    subcast = params.get('subcast', subcast)
-                if default == NOTSET:
-                    default = params.get('default', default)
+                    subcast = params.get("subcast", subcast)
+                if default is NOTSET:
+                    default = params.get("default", default)
             else:
                 if cast is None:
                     cast = params
@@ -97,9 +110,17 @@ class Env(object):
                 value = default
 
         # Resolve any proxied values
-        if hasattr(value, 'startswith') and value.startswith('{{'):
-            value = self.__call__(value.lstrip('{{}}'), default, cast, subcast,
-                                  default, force, preprocessor, postprocessor)
+        if hasattr(value, "startswith") and value.startswith("{{"):
+            value = self.__call__(
+                value.lstrip("{{}}"),
+                default,
+                cast,
+                subcast,
+                default,
+                force,
+                preprocessor,
+                postprocessor,
+            )
 
         if preprocessor:
             value = preprocessor(value)
@@ -125,23 +146,26 @@ class Env(object):
             value = value.lower() in cls.BOOLEAN_TRUE_STRINGS
         elif cast is float:
             # Clean string
-            float_str = re.sub(r'[^\d,\.]', '', value)
+            float_str = re.sub(r"[^\d,\.]", "", value)
             # Split to handle thousand separator for different locales, i.e.
             # comma or dot being the placeholder.
-            parts = re.split(r'[,\.]', float_str)
+            parts = re.split(r"[,\.]", float_str)
             if len(parts) == 1:
                 float_str = parts[0]
             else:
-                float_str = "{0}.{1}".format(''.join(parts[0:-1]), parts[-1])
+                float_str = "{0}.{1}".format("".join(parts[0:-1]), parts[-1])
             value = float(float_str)
-        elif type(cast) is type and (issubclass(cast, list) or
-                                     issubclass(cast, tuple)):
-            value = (subcast(i.strip()) if subcast else i.strip() for i in
-                     value.split(',') if i)
+        elif type(cast) is type and (issubclass(cast, list) or issubclass(cast, tuple)):
+            value = (
+                subcast(i.strip()) if subcast else i.strip()
+                for i in value.split(",")
+                if i
+            )
         elif cast is dict:
-            value = {k.strip(): subcast(v.strip()) if subcast else v.strip()
-                     for k, v in (i.split('=') for i in value.split(',') if
-                     value)}
+            value = {
+                k.strip(): subcast(v.strip()) if subcast else v.strip()
+                for k, v in (i.split("=") for i in value.split(",") if value)
+            }
         try:
             return cast(value)
         except ValueError as error:
@@ -173,14 +197,13 @@ class Env(object):
         if path is None:
             frame = inspect.currentframe().f_back
             caller_dir = os.path.dirname(frame.f_code.co_filename)
-            path = os.path.join(os.path.abspath(caller_dir), '.env')
+            path = os.path.join(os.path.abspath(caller_dir), ".env")
 
         try:
-            with open(path, 'r') as f:
+            with open(path, "r") as f:
                 content = f.read()
-        except getattr(__builtins__, 'FileNotFoundError', IOError):
-            logger.debug('envfile not found at %s, looking in parent dir.',
-                         path)
+        except getattr(__builtins__, "FileNotFoundError", IOError):
+            logger.debug("envfile not found at %s, looking in parent dir.", path)
             filedir, filename = os.path.split(path)
             pardir = os.path.abspath(os.path.join(filedir, os.pardir))
             path = os.path.join(pardir, filename)
@@ -188,26 +211,27 @@ class Env(object):
                 Env.read_envfile(path, **overrides)
             else:
                 # Reached top level directory.
-                warnings.warn('Could not any envfile.')
+                warnings.warn("Could not any envfile.")
             return
 
-        logger.debug('Reading environment variables from: %s', path)
+        logger.debug("Reading environment variables from: %s", path)
         for line in content.splitlines():
             tokens = list(shlex.shlex(line, posix=True))
             # parses the assignment statement
             if len(tokens) < 3:
                 continue
             name, op = tokens[:2]
-            value = ''.join(tokens[2:])
-            if op != '=':
+            value = "".join(tokens[2:])
+            if op != "=":
                 continue
-            if not re.match(r'[A-Za-z_][A-Za-z_0-9]*', name):
+            if not re.match(r"[A-Za-z_][A-Za-z_0-9]*", name):
                 continue
-            value = value.replace(r'\n', '\n').replace(r'\t', '\t')
+            value = value.replace(r"\n", "\n").replace(r"\t", "\t")
             os.environ.setdefault(name, value)
 
         for name, value in overrides.items():
             os.environ.setdefault(name, value)
+
 
 # Convenience object if no schema is required.
 env = Env()
